@@ -26,16 +26,48 @@ const createShip = (name, boardName, length, scene) => {
   for (let i = 1; i <= length; i ++) {
     boxes.push(new BABYLON.Mesh.CreateBox( name, 20, scene ));
   }
+  let notValidPosition = true;
+  let row;
+  let col;
+  let dir = "up";
+  while (notValidPosition) {
+    let signed;
+    if (Math.random() < .5) { signed = -1; } else { signed = 1; }
+    row = ((Math.floor(Math.random() * 8) * signed) * 20) + 10;
+    if (row === 150) { row -= 20; }
+    if (Math.random() < .5) { signed = -1; } else { signed = 1; }
+    col = ((Math.floor(Math.random() * 4) * signed) * 20) - 300;
+    if (col === -360) { col += 20; }
+    // let rand = Math.random();
+    // if (rand < .25) { dir = "up" } else if (rand < .50) { dir = "down" }
+    //   else if (rand < .75) { dir = "left" } else { dir = "right"}
+    let i = 0;
+    while (i < length) {
+      if (dir === "up") {
+        let vec = new BABYLON.Vector3(row, 1, (col + (i * 20)))
+        let ray = new BABYLON.Ray(vec, vec);
+        let pickInfo = scene.pickWithRay(ray, null);
+        if (pickInfo.hit === false && i === length) { notValidPosition = false }
+      }
+      i++;
+    }
+
+
+    notValidPosition = false;
+  }
+
+
   boxes.forEach( (box, idx) => {
     BABYLON.Tags.AddTagsTo(box, name);
     if (boardName === "playerBoard") {
       box.position.x = 20 * idx;
     } else {
-      box.position.x = (20 * idx) - 200;
-      box.position.z = 10;
-      // box.visibility = false;
-      box.isPickable = false;
-      box.visibility = false;
+      BABYLON.Tags.AddTagsTo(box, "opponentShip");
+      if (dir === "up") {
+        box.position.x = col;
+        box.position.z = (row + (idx * 20));
+        box.visibility = false;
+      }
     }
   });
   if (boardName === "opponentBoard") {

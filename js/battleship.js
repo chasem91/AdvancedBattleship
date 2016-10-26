@@ -10,6 +10,7 @@ const light = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(0, 1, 1
 light.intensity = 0.7;
 
 const skybox = BABYLON.Mesh.CreateBox("skyBox", 5000.0, scene);
+skybox.isPickable = false;
 const skyboxMaterial = new BABYLON.StandardMaterial("skyBox", scene);
 skyboxMaterial.backFaceCulling = false;
 skyboxMaterial.reflectionTexture = new BABYLON.CubeTexture("textures/TropicalSunnyDay", scene);
@@ -34,10 +35,10 @@ const createShips = () => {
   ships.push(createShip("submarine1", "playerBoard", 3, scene));
   ships.push(createShip("patrolBoat1", "playerBoard", 2, scene));
   ships.push(createShip("aircraftCarrier2", "opponentBoard", 5, scene));
-  // ships.push(createShip("battleship2", "opponentBoard", 4, scene));
-  // ships.push(createShip("destroyer2", "opponentBoard", 3, scene));
-  // ships.push(createShip("submarine2", "opponentBoard", 3, scene));
-  // ships.push(createShip("patrolBoat2", "opponentBoard", 2, scene));
+  ships.push(createShip("battleship2", "opponentBoard", 4, scene));
+  ships.push(createShip("destroyer2", "opponentBoard", 3, scene));
+  ships.push(createShip("submarine2", "opponentBoard", 3, scene));
+  ships.push(createShip("patrolBoat2", "opponentBoard", 2, scene));
   ships.forEach( ship => shipSegments = shipSegments.concat(ship) );
 
   const shipAnimation = () => {
@@ -61,8 +62,9 @@ const createShips = () => {
 
   ships.forEach( (ship, i) => {
     ship.forEach( segment => {
+      if (segment.hasTags("opponentShip")) {segment.isPickable = false;}
       segment.animations.push(shipAnimation());
-      setTimeout(() => scene.beginAnimation(segment, 0, 200, true), (2000 * i));
+      setTimeout(() => scene.beginAnimation(segment, 0, 200, true), (500 * i));
     });
   })
 }
