@@ -9,8 +9,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "webpack": "webpack --watch",
-    "start": "http-server -a localhost -p 8000 -c-1",
-    "postinstall": "webpack --config ./webpack.config.js"
+    "start": "http-server -a localhost -p 8000 -c-1"
   },
   "keywords": [],
   "author": "",
