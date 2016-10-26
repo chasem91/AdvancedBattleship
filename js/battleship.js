@@ -1,34 +1,110 @@
-import createPlayerBoard from './player_board';
-import createOpponentBoard from './opponent_board';
-import createShip from './ship.js';
-
 const canvas = document.getElementById("render-canvas");
 const engine = new BABYLON.Engine(canvas, true);
 
 const scene = new BABYLON.Scene(engine);
+scene.collisionsEnabled = true;
 const camera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(230, 240, 0), scene);
 camera.lockedTarget = new BABYLON.Vector3(-30, 0, 0);
 camera.attachControl(canvas, true);
 const light = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(0, 1, 1), scene);
 light.intensity = 0.7;
 
+const skybox = BABYLON.Mesh.CreateBox("skyBox", 5000.0, scene);
+const skyboxMaterial = new BABYLON.StandardMaterial("skyBox", scene);
+skyboxMaterial.backFaceCulling = false;
+skyboxMaterial.reflectionTexture = new BABYLON.CubeTexture("textures/TropicalSunnyDay", scene);
+skyboxMaterial.reflectionTexture.coordinatesMode = BABYLON.Texture.SKYBOX_MODE;
+skyboxMaterial.diffuseColor = new BABYLON.Color3(0, 0, 0);
+skyboxMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
+skyboxMaterial.disableLighting = true;
+skybox.material = skyboxMaterial;
+
 const playerBoard = createPlayerBoard(scene);
 const opponentBoard = createOpponentBoard(scene);
+
 opponentBoard.position.x = -250;
-createShip("aircraftCarrier1", "playerBoard", 5, scene);
-createShip("battleship1", "playerBoard", 4, scene);
-createShip("destroyer1", "playerBoard", 3, scene);
-createShip("submarine1", "playerBoard", 3, scene);
-createShip("patrolBoat1", "playerBoard", 2, scene);
-createShip("aircraftCarrier2", "opponentBoard", 5, scene);
-createShip("battleship2", "opponentBoard", 4, scene);
-createShip("destroyer2", "opponentBoard", 3, scene);
-createShip("submarine2", "opponentBoard", 3, scene);
-createShip("patrolBoat2", "opponentBoard", 2, scene);
+
+let shipSegments = [];
+let ships = [];
+
+const createShips = () => {
+  ships.push(createShip("aircraftCarrier1", "playerBoard", 5, scene));
+  ships.push(createShip("battleship1", "playerBoard", 4, scene));
+  ships.push(createShip("destroyer1", "playerBoard", 3, scene));
+  ships.push(createShip("submarine1", "playerBoard", 3, scene));
+  ships.push(createShip("patrolBoat1", "playerBoard", 2, scene));
+  ships.push(createShip("aircraftCarrier2", "opponentBoard", 5, scene));
+  // ships.push(createShip("battleship2", "opponentBoard", 4, scene));
+  // ships.push(createShip("destroyer2", "opponentBoard", 3, scene));
+  // ships.push(createShip("submarine2", "opponentBoard", 3, scene));
+  // ships.push(createShip("patrolBoat2", "opponentBoard", 2, scene));
+  ships.forEach( ship => shipSegments = shipSegments.concat(ship) );
+
+  const shipAnimation = () => {
+    const animationSegment = new BABYLON.Animation(
+      "myAnimation2",
+      "position.y",
+      30,
+      BABYLON.Animation.ANIMATIONTYPE_FLOAT,
+      BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE
+    );
+    const keys = [];
+    keys.push({frame: 0, value: 5});
+    keys.push({frame: 100, value: -3});
+    keys.push({frame: 200, value: 5});
+    animationSegment.setKeys(keys);
+    const easingFunction = new BABYLON.QuadraticEase();
+    easingFunction.setEasingMode(BABYLON.EasingFunction.EASINGMODE_EASEINOUT);
+    animationSegment.setEasingFunction(easingFunction);
+    return animationSegment;
+  }
+
+  ships.forEach( (ship, i) => {
+    ship.forEach( segment => {
+      segment.animations.push(shipAnimation());
+      setTimeout(() => scene.beginAnimation(segment, 0, 200, true), (2000 * i));
+    });
+  })
+}
+createShips();
+
+//animate rougher seas towards end of game
+const createWater = () => {
+  const waterMesh = BABYLON.Mesh.CreateGround("waterMesh", 1024, 1800, 32, scene);
+  waterMesh.isPickable = false;
+  waterMesh.position.y = 0;
+  const waterMaterial = new BABYLON.WaterMaterial("water", scene);
+  waterMaterial.alpha = .8;
+  var probe = new BABYLON.ReflectionProbe("main", 512, scene);
+  probe.renderList.push(opponentBoard);
+  probe.renderList.push(playerBoard);
+  waterMaterial.refractionTexture = probe.cubeTexture;
+  waterMaterial.indexOfRefraction = 1.05;
+  waterMaterial.bumpTexture = new BABYLON.Texture("waterbump.png", scene);
+
+  waterMesh.material = waterMaterial;
+
+  waterMaterial.addToRenderList(playerBoard);
+  waterMaterial.addToRenderList(opponentBoard);
+  waterMaterial.addToRenderList(skybox);
+  shipSegments.forEach( segment => waterMaterial.addToRenderList(segment) );
+  waterMaterial.windForce = 5;
+  waterMaterial.waveHeight = .6;
+  waterMaterial.bumpHeight = 0.13;
+  waterMaterial.windDirection = new BABYLON.Vector2(1.0, 1.0);
+  // waterMaterial.waterColor = new BABYLON.Color3(0.1, 0.1, 0.6);
+  // waterMaterial.colorBlendFactor = 2.2;
+  waterMaterial.waveLength = 0.1;
+  // waterMaterial.backFaceCulling = true;
+
+}
+createWater();
 
 const attatchEmitter = (mesh) => {
   // Create a particle system
   const particleSystem = new BABYLON.ParticleSystem("particles", 600, scene);
+
+  particleSystem.renderingGroupId = 1;
 
   //Texture of each particle
   particleSystem.particleTexture = new BABYLON.Texture("explosion.png", scene);
@@ -93,14 +169,16 @@ const attatchEmitter = (mesh) => {
 	particleSystem.updateFunction = updateFunction;
 
   particleSystem.start();
+  return particleSystem;
 }
 
 const fireProjectile = (point) => {
   const projectile = new BABYLON.Mesh.CreateSphere("projectile", 16, 4, scene);
+  projectile._checkCollisions = true;
   projectile.position = new BABYLON.Vector3(
     (Math.round(point.x / 20) * 20) + 480,
     projectile.position.y,
-    (Math.round((point.z + 10) / 20) * 20) - 10,
+    (Math.round((point.z + 10) / 20) * 20) - 10
   );
   const vertAnim1 = () => {
     const animationProjectile = new BABYLON.Animation(
@@ -108,7 +186,7 @@ const fireProjectile = (point) => {
       "position.y",
       30,
       BABYLON.Animation.ANIMATIONTYPE_FLOAT,
-      BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE
+      BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT
     );
 
     const keys = [];
@@ -130,7 +208,7 @@ const fireProjectile = (point) => {
       "position.y",
       30,
       BABYLON.Animation.ANIMATIONTYPE_FLOAT,
-      BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE
+      BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT
     );
 
     const nextPos = 0;
@@ -154,7 +232,7 @@ const fireProjectile = (point) => {
       "position.x",
       30,
       BABYLON.Animation.ANIMATIONTYPE_FLOAT,
-      BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE
+      BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT
     );
 
     const nextPos = projectile.position.x - 240;
@@ -173,11 +251,21 @@ const fireProjectile = (point) => {
   projectile.animations.push(vertAnim1());
   projectile.animations.push(horizAnim());
 
-  attatchEmitter(projectile);
+  const particleSystem = attatchEmitter(projectile);
+
+  const fireLight = new BABYLON.PointLight("Omni1", new BABYLON.Vector3(
+    projectile.position.x,
+    projectile.position.y + 2,
+    projectile.position.z
+  ), scene);
+  fireLight.diffuse = new BABYLON.Color3(1, 0, 0);
+  fireLight.specular = new BABYLON.Color3(1, 1, 1);
+  fireLight.parent = projectile;
+  fireLight.intensity = 1.5;
 
   scene.beginAnimation(
     projectile,
-    0, 75, false, 3,
+    0, 75, false, 2,
     () => {
       projectile.animations = [];
       projectile.animations.push(vertAnim2());
@@ -186,9 +274,18 @@ const fireProjectile = (point) => {
         projectile,
         76, 150, false, 2,
         () => {
-          const p = projectile;
-          const s = scene;
-          debugger
+          const opponentShipNames = [ "aircraftCarrier2", "battleship2", "destroyer2", "submarine2", "patrolBoat2" ];
+          let hit = false;
+          opponentShipNames.forEach( name => {
+            scene.getMeshesByTags(name).forEach( shipSegment => {
+              fireLight.dispose();
+              if (shipSegment.intersectsMesh(projectile)) {
+                shipSegment.visibility = 1;
+                hit = true;
+              }
+            })
+          })
+          if (hit) {return;} else particleSystem.emitRate = 0;
         }
       )
     }
@@ -198,63 +295,64 @@ const fireProjectile = (point) => {
 let startingPoint;
 let currentMesh;
 
-const snapToGrid = () => {
-  const shipSegments = scene.getMeshesByTags(currentMesh.id);
-  shipSegments.forEach(segment => {
-    segment.position = new BABYLON.Vector3(
-      (Math.round((segment.position.x + 10) / 20) * 20) - 10,
-      segment.position.y,
-      (Math.round((segment.position.z + 10) / 20) * 20) - 10,
-    )
-  });
-}
-const getGroundPosition = () => {
-  const pickInfo = scene.pick(scene.pointerX, scene.pointerY, (mesh) => {
-    return mesh == playerBoard;
-  });
-  if (pickInfo.hit) {
-    return pickInfo.pickedPoint;
+const createEventListeners = () => {
+  const snapToGrid = () => {
+    const shipSegments = scene.getMeshesByTags(currentMesh.id);
+    shipSegments.forEach(segment => {
+      segment.position = new BABYLON.Vector3(
+        (Math.round((segment.position.x + 10) / 20) * 20) - 10,
+        segment.position.y,
+        (Math.round((segment.position.z + 10) / 20) * 20) - 10
+      )
+    });
   }
-  return null;
-}
-const onMouseDown = (e) => {
-  if (e.button !== 0) {
-    return;
+  const getGroundPosition = () => {
+    const pickInfo = scene.pick(scene.pointerX, scene.pointerY, (mesh) => {
+      return mesh == playerBoard;
+    });
+    if (pickInfo.hit) {
+      return pickInfo.pickedPoint;
+    }
+    return null;
   }
-  const pickInfo = scene.pick(scene.pointerX, scene.pointerY, (mesh) => {
-    return mesh !== playerBoard;
-  });
-  if (pickInfo.hit) {
-    currentMesh = pickInfo.pickedMesh;
-    startingPoint = getGroundPosition();
-    if (startingPoint) {
-      setTimeout(() => {
-        camera.detachControl(canvas);
-      }, 0);
+  const onMouseDown = (e) => {
+    if (e.button !== 0) {
+      return;
+    }
+    const pickInfo = scene.pick(scene.pointerX, scene.pointerY, (mesh) => {
+      return mesh !== playerBoard;
+    });
+    if (pickInfo.hit) {
+      currentMesh = pickInfo.pickedMesh;
+      startingPoint = getGroundPosition();
+      if (startingPoint) {
+        setTimeout(() => {
+          camera.detachControl(canvas);
+        }, 0);
+      }
     }
   }
-}
-const onMouseUp = () => {
-  const pickInfo = scene.pick(scene.pointerX, scene.pointerY);
-  if (startingPoint) {
-    camera.attachControl(canvas, true);
-    startingPoint = null;
-    snapToGrid();
-    return;
-  } else if (pickInfo.pickedMesh && (pickInfo.pickedMesh.name === "opponentBoard")) {
-    opponentBoard.subMeshes[pickInfo.subMeshId].hit = true;
-    fireProjectile(pickInfo.pickedPoint);
+  const onMouseUp = () => {
+    const pickInfo = scene.pick(scene.pointerX, scene.pointerY);
+    if (startingPoint) {
+      camera.attachControl(canvas, true);
+      startingPoint = null;
+      snapToGrid();
+      return;
+    } else if (pickInfo.pickedMesh && (pickInfo.pickedMesh.name === "opponentBoard")) {
+      opponentBoard.subMeshes[pickInfo.subMeshId].hit = true;
+      fireProjectile(pickInfo.pickedPoint);
+    }
   }
-}
-const onMouseMove = (e) => {
+  const onMouseMove = (e) => {
     if (!startingPoint) {
-        return;
+      return;
     }
 
     const current = getGroundPosition(e);
 
-    if (!current) {
-        return;
+    if (!current || currentMesh.name === "waterMesh") {
+      return;
     }
 
     const diff = current.subtract(startingPoint);
@@ -269,49 +367,51 @@ const onMouseMove = (e) => {
 
     startingPoint = current;
 
-}
-const onMouseOver = (e) => {
-  e.preventDefault();
-  const s = scene;
-}
-const onKeyPress = (e) => {
-  if (e.key === " ") {
-    if (currentMesh) {
-      const currentMeshes = scene.getMeshesByTags(currentMesh.id);
-      const oldPosition = currentMesh.position;
-      currentMeshes.forEach( mesh => {
-        mesh.position = new BABYLON.Vector3(
-          mesh.position.z,
-          mesh.position.y,
-          mesh.position.x
+  }
+  const onMouseOver = (e) => {
+    e.preventDefault();
+    const s = scene;
+  }
+  const onKeyPress = (e) => {
+    if (e.key === " ") {
+      if (currentMesh) {
+        const currentMeshes = scene.getMeshesByTags(currentMesh.id);
+        const oldPosition = currentMesh.position;
+        currentMeshes.forEach( mesh => {
+          mesh.position = new BABYLON.Vector3(
+            mesh.position.z,
+            mesh.position.y,
+            mesh.position.x
+          );
+        });
+        const newPosition = currentMesh.position;
+        const positionOffset = new BABYLON.Vector3(
+          (oldPosition.x - newPosition.x),
+          (oldPosition.y - newPosition.y),
+          (oldPosition.z - newPosition.z)
         );
-      });
-      const newPosition = currentMesh.position;
-      const positionOffset = new BABYLON.Vector3(
-        (oldPosition.x - newPosition.x),
-        (oldPosition.y - newPosition.y),
-        (oldPosition.z - newPosition.z),
-      );
-      currentMeshes.forEach( mesh => {
-        mesh.position.addInPlace(positionOffset);
-      });
+        currentMeshes.forEach( mesh => {
+          mesh.position.addInPlace(positionOffset);
+        });
+      }
     }
   }
-}
 
-canvas.addEventListener("mousedown", onMouseDown, false);
-canvas.addEventListener("mouseup", onMouseUp, false);
-canvas.addEventListener("mousemove", onMouseMove, false);
-canvas.addEventListener("mouseover", onMouseOver, false);
-window.addEventListener("keypress", onKeyPress, false);
+  canvas.addEventListener("mousedown", onMouseDown, false);
+  canvas.addEventListener("mouseup", onMouseUp, false);
+  canvas.addEventListener("mousemove", onMouseMove, false);
+  canvas.addEventListener("mouseover", onMouseOver, false);
+  window.addEventListener("keypress", onKeyPress, false);
 
-scene.onDispose = () => {
-  canvas.removeEventListener("mousedown", onMouseDown);
-  canvas.removeEventListener("mouseup", onMouseUp);
-  canvas.removeEventListener("mousemove", onMouseMove);
-  canvas.removeEventListener("mouseover", onMouseOver);
-  window.removeEventListener("keypress", onKeyPress);
+  scene.onDispose = () => {
+    canvas.removeEventListener("mousedown", onMouseDown);
+    canvas.removeEventListener("mouseup", onMouseUp);
+    canvas.removeEventListener("mousemove", onMouseMove);
+    canvas.removeEventListener("mouseover", onMouseOver);
+    window.removeEventListener("keypress", onKeyPress);
+  }
 }
+createEventListeners();
 
 const playerShipNames = [
   "aircraftCarrier1",

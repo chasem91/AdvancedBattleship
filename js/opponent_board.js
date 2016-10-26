@@ -1,4 +1,4 @@
-export default (scene) => {
+const createOpponentBoard = (scene) => {
   const tiledGround = new BABYLON.Mesh.CreateTiledGround(
     "opponentBoard",
     -100, -140, 100, 140,
@@ -8,15 +8,20 @@ export default (scene) => {
   );
   const lightRedMaterial = new BABYLON.StandardMaterial("LightRed", scene);
   lightRedMaterial.diffuseColor = new BABYLON.Color3(.95, 0, 0);
+  // lightRedMaterial.alpha = .2;
 
   const darkRedMaterial = new BABYLON.StandardMaterial("DarkRed", scene);
-  darkRedMaterial.diffuseColor = new BABYLON.Color3(.65, 0, 0);
+  darkRedMaterial.diffuseColor = new BABYLON.Color3(.25, 0, 0);
+  // darkRedMaterial.alpha = .2;
 
   const yellowMaterial = new BABYLON.StandardMaterial("Yellow", scene);
   yellowMaterial.diffuseColor = new BABYLON.Color3(1, 1, 0);
+  yellowMaterial.emissiveColor = new BABYLON.Color3(1, 1, 0);
+  // yellowMaterial.alpha = .2;
 
   const orangeMaterial = new BABYLON.StandardMaterial("Orange", scene);
   orangeMaterial.diffuseColor = new BABYLON.Color3(1, .8, 0);
+  // orangeMaterial.alpha = .2;
 
   const multimat = new BABYLON.MultiMaterial("multi", scene);
   multimat.subMaterials.push(lightRedMaterial);

@@ -1,4 +1,4 @@
-export default (scene) => {
+const createPlayerBoard = (scene) => {
   const tiledGround = new BABYLON.Mesh.CreateTiledGround(
     "playerBoard",
     -100, -140, 100, 140,
@@ -10,10 +10,12 @@ export default (scene) => {
   lightGreenMaterial.diffuseColor = new BABYLON.Color3(.41, .61, .45);
 
   const darkGreenMaterial = new BABYLON.StandardMaterial("DarkGreen", scene);
-  darkGreenMaterial.diffuseColor = new BABYLON.Color3(.59, .80, .60);
+  darkGreenMaterial.diffuseColor = new BABYLON.Color3(.79, 1.00, .80);
 
   const redMaterial = new BABYLON.StandardMaterial("Red", scene);
   redMaterial.diffuseColor = new BABYLON.Color3(1, 0, 0);
+  redMaterial.emissiveColor = new BABYLON.Color3(1, 0, 0);
+
 
   const multimat = new BABYLON.MultiMaterial("multi", scene);
   multimat.subMaterials.push(lightGreenMaterial);

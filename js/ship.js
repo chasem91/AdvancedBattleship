@@ -12,14 +12,14 @@ const rotate = (mesh, scene) => {
   const positionOffset = new BABYLON.Vector3(
     (oldPosition.x - newPosition.x),
     (oldPosition.y - newPosition.y),
-    (oldPosition.z - newPosition.z),
+    (oldPosition.z - newPosition.z)
   );
   currentMeshes.forEach( mesh => {
     mesh.position.addInPlace(positionOffset);
   });
 };
 
-export default (name, boardName, length, scene) => {
+const createShip = (name, boardName, length, scene) => {
   // const ship = new BABYLON.Mesh.CreateBox("ship1", 20, scene);
   // ship.isVisible = false;
   const boxes = [];
@@ -35,9 +35,11 @@ export default (name, boardName, length, scene) => {
       box.position.z = 10;
       // box.visibility = false;
       box.isPickable = false;
+      box.visibility = false;
     }
   });
   if (boardName === "opponentBoard") {
     rotate(boxes[0], scene);
   }
+  return boxes;
 }
