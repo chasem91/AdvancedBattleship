@@ -9,17 +9,17 @@ const configureScene = () => {
     "patrolBoat1"
   ];
 
-  scene.debugLayer.show();
-
-  scene.debugLayer.axisRatio = 0.04; // 4% of canvas width
-
-  scene.debugLayer.shouldDisplayLabel = function(node) {
-    return node.name === "playerBoard";
-  }
-
-  scene.debugLayer.shouldDisplayAxis = function(mesh) {
-    return mesh.name === "playerBoard";
-  }
+  // scene.debugLayer.show();
+  //
+  // scene.debugLayer.axisRatio = 0.04; // 4% of canvas width
+  //
+  // scene.debugLayer.shouldDisplayLabel = function(node) {
+  //   return node.name === "playerBoard";
+  // }
+  //
+  // scene.debugLayer.shouldDisplayAxis = function(mesh) {
+  //   return mesh.name === "playerBoard";
+  // }
 
   scene.registerBeforeRender(() => {
 

@@ -38,7 +38,6 @@ const createShip = (name, boardName, length, scene) => {
   let row;
   let col;
 
-  console.log(name);
   while (invalidPostion) {
     invalidPostion = false;
 

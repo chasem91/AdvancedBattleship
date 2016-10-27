@@ -1,5 +1,7 @@
+let transitionCamera1;
+let transitionCamera2;
 const createAnimations = () => {
-  const transitionCamera1 = () => {
+  transitionCamera1 = () => {
     const xAnim = () => {
       const animationCameraX = new BABYLON.Animation(
         "myAnimation1",
@@ -73,7 +75,7 @@ const createAnimations = () => {
 
     scene.beginAnimation(camera, 0, 75, false);
   }
-  const transitionCamera2 = () => {
+  transitionCamera2 = () => {
     const xAnim = () => {
       const animationCameraX = new BABYLON.Animation(
         "myAnimation1",
@@ -148,3 +150,4 @@ const createAnimations = () => {
     scene.beginAnimation(camera, 0, 75, false);
   }
 }
+  
