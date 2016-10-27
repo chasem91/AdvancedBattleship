@@ -99,7 +99,7 @@ const createEventListeners = () => {
           mesh.position.addInPlace(positionOffset);
         });
       }
-    } else if (e.key === "Tab") {
+    } else if (e.key === "v") {
       if (camera.state === "" || camera.state === "initial") {
         transitionCamera1();
         camera.state = "transitioned"
