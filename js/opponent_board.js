@@ -6,6 +6,8 @@ const createOpponentBoard = (scene) => {
     { 'h': 14, 'w': 10 },
     scene
   );
+  tiledGround.position.x = -250;
+
   const lightRedMaterial = new BABYLON.StandardMaterial("LightRed", scene);
   lightRedMaterial.diffuseColor = new BABYLON.Color3(.95, 0, 0);
   // lightRedMaterial.alpha = .2;
