@@ -22,44 +22,43 @@ const configureScene = () => {
   // }
 
   scene.registerBeforeRender(() => {
-
-
-
     playerBoard.subMeshes.forEach( subMesh => {
       subMesh.materialIndex = subMesh.originalMaterialIndex
     });
-    playerShipNames.forEach( shipName => {
-      const shipSegments = scene.getMeshesByTags(shipName);
-      shipSegments.forEach(segment => {
-        let ray = new BABYLON.Ray(
-          new BABYLON.Vector3(
-            segment.position.x,
-            playerBoard.getBoundingInfo().boundingBox.maximumWorld.y + 1,
-            segment.position.z),
-            new BABYLON.Vector3(0, -1, 0)
-          );
-          const worldInverse = new BABYLON.Matrix();
-          playerBoard.getWorldMatrix().invertToRef(worldInverse);
-          ray = BABYLON.Ray.Transform(ray, worldInverse);
-          const pickInfo = playerBoard.intersects(ray);
-          if (pickInfo.hit) {
-            playerBoard.subMeshes[pickInfo.subMeshId].materialIndex = 2;
-          }
-        })
-      });
-      opponentBoard.subMeshes.forEach( subMesh => {
-        subMesh.materialIndex = subMesh.hit ? 3 : subMesh.originalMaterialIndex
-      });
-      const pickInfo = scene.pick(scene.pointerX, scene.pointerY);
-      if (pickInfo.pickedMesh && (pickInfo.pickedMesh.name === "opponentBoard")){
-        const subMesh = opponentBoard.subMeshes[pickInfo.subMeshId];
-        if (subMesh.hit) {
-          subMesh.materialIndex = 3;
-        } else {
-          subMesh.materialIndex = 2;
-        }
-      }
+    opponentBoard.subMeshes.forEach( subMesh => {
+      subMesh.materialIndex = subMesh.hit ? 3 : subMesh.originalMaterialIndex
     });
-
+    const pickInfo = scene.pick(scene.pointerX, scene.pointerY);
+    if (pickInfo.pickedMesh && (pickInfo.pickedMesh.name === "opponentBoard" && playingGame && playerTurn)){
+      const subMesh = opponentBoard.subMeshes[pickInfo.subMeshId];
+      if (subMesh.hit) {
+        subMesh.materialIndex = 3;
+      } else {
+        subMesh.materialIndex = 2;
+      }
+    }
+    playerShipNames.forEach( shipName => {
+        const shipSegments = scene.getMeshesByTags(shipName);
+        if (preGame) {
+          shipSegments.forEach(segment => {
+            let ray = new BABYLON.Ray(
+              new BABYLON.Vector3(
+                segment.position.x,
+                playerBoard.getBoundingInfo().boundingBox.maximumWorld.y + 1,
+                segment.position.z
+              ),
+              new BABYLON.Vector3(0, -1, 0)
+            );
+            const worldInverse = new BABYLON.Matrix();
+            playerBoard.getWorldMatrix().invertToRef(worldInverse);
+            ray = BABYLON.Ray.Transform(ray, worldInverse);
+            const pickInfo = playerBoard.intersects(ray);
+            if (pickInfo.hit) {
+              playerBoard.subMeshes[pickInfo.subMeshId].materialIndex = 2;
+            }
+          });
+        }
+      });
+    });
   return scene;
 }

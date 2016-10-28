@@ -1,11 +1,34 @@
 const fireProjectile = (point) => {
   const projectile = new BABYLON.Mesh.CreateSphere("projectile", 16, 4, scene);
   projectile._checkCollisions = true;
-  projectile.position = new BABYLON.Vector3(
-    (Math.round(point.x / 20) * 20) + 480,
-    projectile.position.y,
-    (Math.round((point.z + 10) / 20) * 20) - 10
-  );
+  if (opponentTurn) { playerTurn = false; }
+  const currentPlayer = playerTurn;
+  playerTurn = false;
+  if (currentPlayer) {
+    projectile.position = new BABYLON.Vector3(
+      (Math.round(point.x / 20) * 20) + 480,
+      projectile.position.y,
+      (Math.round((point.z + 10) / 20) * 20) - 10
+    );
+  } else if (opponentTurn) {
+    let row;
+    let col;
+    let signed;
+    if (Math.random() < .5) { signed = -1; } else { signed = 1; }
+    row = ((Math.floor(Math.random() * 6) * signed) * 20) + 10;
+    if (row === 110) {
+      row -= 20;
+    }
+
+    if (Math.random() < .5) { signed = -1; } else { signed = 1; }
+    col = ((Math.floor(Math.random() * 7) * signed) * 20) + 10;
+
+    projectile.position = new BABYLON.Vector3(
+      (Math.round(row / 20) * 20) - 490,
+      projectile.position.y,
+      (Math.round((col + 10) / 20) * 20) - 10
+    );
+  }
   const vertAnim1 = () => {
     const animationProjectile = new BABYLON.Animation(
       "myAnimation1",
@@ -61,21 +84,33 @@ const fireProjectile = (point) => {
       BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT
     );
 
-    const nextPos = projectile.position.x - 240;
+    if (currentPlayer) {
+      const nextPos1 = projectile.position.x - 240;
 
-    const keys = [];
-    keys.push({frame: 0, value: projectile.position.x});
-    keys.push({frame: 75, value: nextPos});
-    keys.push({frame: 75, value: nextPos + 240});
-    keys.push({frame: 150, value: nextPos});
+      const keys = [];
+      keys.push({frame: 0, value: projectile.position.x});
+      keys.push({frame: 75, value: nextPos1});
+      keys.push({frame: 75, value: nextPos1 + 240});
+      keys.push({frame: 150, value: nextPos1});
 
-    animationProjectile.setKeys(keys);
+      animationProjectile.setKeys(keys);
+    } else if (opponentTurn) {
+      const nextPos1 = projectile.position.x + 240;
+
+      const keys = [];
+      keys.push({frame: 0, value: projectile.position.x});
+      keys.push({frame: 75, value: nextPos1});
+      keys.push({frame: 75, value: nextPos1 - 240});
+      keys.push({frame: 150, value: nextPos1});
+
+      animationProjectile.setKeys(keys);
+    }
 
     return animationProjectile;
   }
 
-  projectile.animations.push(vertAnim1());
   projectile.animations.push(horizAnim());
+  projectile.animations.push(vertAnim1());
 
   const particleSystem = attatchEmitter(projectile);
 
@@ -111,7 +146,8 @@ const fireProjectile = (point) => {
               }
             })
           })
-          if (hit) {return;} else particleSystem.emitRate = 0;
+          if (!hit) {particleSystem.emitRate = 0;}
+          takeTurn();
         }
       )
     }

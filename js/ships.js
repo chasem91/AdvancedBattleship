@@ -32,7 +32,6 @@ const createShips = () => {
     animationSegment.setEasingFunction(easingFunction);
     return animationSegment;
   }
-
   ships.forEach( (ship, i) => {
     ship.forEach( segment => {
       // if (segment.hasTags("opponentShip")) {segment.isPickable = false;}

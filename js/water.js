@@ -25,5 +25,5 @@ const createWater = () => {
   // waterMaterial.waterColor = new BABYLON.Color3(0.1, 0.1, 0.6);
   // waterMaterial.colorBlendFactor = 2.2;
   waterMaterial.waveLength = 0.1;
-  // waterMaterial.backFaceCulling = true
+  waterMaterial.backFaceCulling = true
 }

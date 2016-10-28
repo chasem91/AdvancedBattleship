@@ -1,6 +1,10 @@
 const createEventListeners = () => {
   let startingPoint;
   let currentMesh;
+  const lockPlayerBoard = () => {
+    preGame = false;
+    playingGame = true;
+  }
   const snapToGrid = () => {
     const shipSegments = scene.getMeshesByTags(currentMesh.id);
     shipSegments.forEach(segment => {
@@ -44,7 +48,9 @@ const createEventListeners = () => {
       startingPoint = null;
       snapToGrid();
       return;
-    } else if (pickInfo.pickedMesh && (pickInfo.pickedMesh.name === "opponentBoard")) {
+    } else if (pickInfo.pickedMesh &&
+      (pickInfo.pickedMesh.name === "opponentBoard" && playingGame && playerTurn)
+    ) {
       opponentBoard.subMeshes[pickInfo.subMeshId].hit = true;
       fireProjectile(pickInfo.pickedPoint);
     }
@@ -64,7 +70,9 @@ const createEventListeners = () => {
     const currentMeshes = scene.getMeshesByTags(currentMesh.id);
     if (currentMeshes.length > 0) {
       currentMeshes.forEach( mesh => {
-        mesh.position.addInPlace(diff);
+        if (preGame) {
+          mesh.position.addInPlace(diff);
+        }
       });
     } else {
       currentMesh.position.addInPlace(diff);
@@ -106,6 +114,11 @@ const createEventListeners = () => {
       } else if (camera.state === "transitioned") {
         transitionCamera2();
         camera.state = "initial"
+      }
+    } else if (e.key === "Enter") {
+      if (preGame) {
+        lockPlayerBoard();
+        playGame();
       }
     }
   }
