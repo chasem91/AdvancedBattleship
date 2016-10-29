@@ -126,14 +126,14 @@ const fireProjectile = (point) => {
 
   scene.beginAnimation(
     projectile,
-    0, 75, false, 8,
+    0, 75, false, 2,
     () => {
       projectile.animations = [];
       projectile.animations.push(vertAnim2());
       projectile.animations.push(horizAnim());
       scene.beginAnimation(
         projectile,
-        76, 150, false, 8,
+        76, 150, false, 2,
         () => {
           let shipNames;
           if (opponentTurn) {

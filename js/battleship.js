@@ -15,7 +15,7 @@ const cameraTarget = createCameraOutput[1];
 const skybox = createSkybox();
 const playerBoard = new PlayerBoard();
 const opponentBoard = new OpponentBoard();
-// createWater();
+createWater();
 createAnimations();
 createEventListeners();
 
