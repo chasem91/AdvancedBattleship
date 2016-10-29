@@ -126,26 +126,32 @@ const fireProjectile = (point) => {
 
   scene.beginAnimation(
     projectile,
-    0, 75, false, 2,
+    0, 75, false, 8,
     () => {
       projectile.animations = [];
       projectile.animations.push(vertAnim2());
       projectile.animations.push(horizAnim());
       scene.beginAnimation(
         projectile,
-        76, 150, false, 2,
+        76, 150, false, 8,
         () => {
-          const opponentShipNames = [ "aircraftCarrier2", "battleship2", "destroyer2", "submarine2", "patrolBoat2" ];
+          let shipNames;
+          if (opponentTurn) {
+            shipNames = [ "aircraftCarrier1", "battleship1", "destroyer1", "submarine1", "patrolBoat1" ];
+          } else {
+            shipNames = [ "aircraftCarrier2", "battleship2", "destroyer2", "submarine2", "patrolBoat2" ];
+          }
           let hit = false;
-          opponentShipNames.forEach( name => {
+          shipNames.forEach( name => {
             scene.getMeshesByTags(name).forEach( shipSegment => {
               fireLight.dispose();
-              if (shipSegment.intersectsMesh(projectile)) {
+              if (shipSegment.position.x === projectile.position.x && shipSegment.position.z === projectile.position.z) {
                 shipSegment.visibility = 1;
+                shipSegment.material.subMaterials.shift();
                 hit = true;
               }
-            })
-          })
+            });
+          });
           if (!hit) {particleSystem.emitRate = 0;}
           takeTurn();
         }

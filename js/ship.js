@@ -94,6 +94,19 @@ const createShip = (name, boardName, length, scene) => {
   const boxes = [];
   for (let i = 1; i <= length; i ++) {
     const box = new BABYLON.Mesh.CreateBox( name, 20, scene );
+
+    const lightGrayMaterial = new BABYLON.StandardMaterial("LightGray", scene);
+    lightGrayMaterial.diffuseColor = new BABYLON.Color3(.85, .85, .85);
+
+    const blackMaterial = new BABYLON.StandardMaterial("Black", scene);
+    blackMaterial.diffuseColor = new BABYLON.Color3(0, 0, 0);
+
+    const multimat = new BABYLON.MultiMaterial("multi", scene);
+    multimat.subMaterials.push(lightGrayMaterial);
+    multimat.subMaterials.push(blackMaterial);
+
+    box.material = multimat;
+
     boxes.push(box);
   }
   boxes.forEach( (box, idx) => {

@@ -1,6 +1,6 @@
 const attatchEmitter = (mesh) => {
   // Create a particle system
-  const particleSystem = new BABYLON.ParticleSystem("particles", 600, scene);
+  const particleSystem = new BABYLON.ParticleSystem("particles", 800, scene);
 
   particleSystem.renderingGroupId = 1;
 

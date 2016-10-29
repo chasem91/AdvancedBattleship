@@ -17,7 +17,7 @@ const createEventListeners = () => {
   }
   const getGroundPosition = () => {
     const pickInfo = scene.pick(scene.pointerX, scene.pointerY, (mesh) => {
-      return mesh == playerBoard;
+      return mesh == playerBoard.board;
     });
     if (pickInfo.hit) {
       return pickInfo.pickedPoint;
@@ -29,7 +29,7 @@ const createEventListeners = () => {
       return;
     }
     const pickInfo = scene.pick(scene.pointerX, scene.pointerY, (mesh) => {
-      return mesh !== playerBoard && mesh !== skybox;
+      return mesh !== playerBoard.board && mesh !== skybox;
     });
     if (pickInfo.hit) {
       currentMesh = pickInfo.pickedMesh;
@@ -51,7 +51,7 @@ const createEventListeners = () => {
     } else if (pickInfo.pickedMesh &&
       (pickInfo.pickedMesh.name === "opponentBoard" && playingGame && playerTurn)
     ) {
-      opponentBoard.subMeshes[pickInfo.subMeshId].hit = true;
+      opponentBoard.grid[pickInfo.subMeshId].hit = true;
       fireProjectile(pickInfo.pickedPoint);
     }
   }

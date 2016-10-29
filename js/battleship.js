@@ -13,14 +13,12 @@ const createCameraOutput = createCamera();
 const camera = createCameraOutput[0];
 const cameraTarget = createCameraOutput[1];
 const skybox = createSkybox();
-const playerBoard = createPlayerBoard(scene);
-const opponentBoard = createOpponentBoard(scene);
-const shipSegments = createShips();
-createWater();
+const playerBoard = new PlayerBoard();
+const opponentBoard = new OpponentBoard();
+// createWater();
 createAnimations();
 createEventListeners();
 
 engine.runRenderLoop(() => {
-  scene.render();
-}
-);
+    scene.render();
+  });
