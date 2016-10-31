@@ -2,10 +2,9 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <link rel="stylesheet" type="text/css" href="./battleship.css">
+    <link rel="stylesheet" type="text/css" href="./css/battleship.css">
   </head>
   <body>
-    <script src="./js/babylon.js" charset="utf-8"></script>
     <ul>
       <li>Click and drag ships to configure board</li>
       <li>"SPACE": rotate ship</li>
@@ -14,24 +13,25 @@
       <li>Click enemy tiles to attack</li>
     </ul>
     <canvas id="render-canvas"></canvas>
-    <script src="./js/babylon.js" charset="utf-8"></script>
-    <script src="./js/babylon.waterMaterial.js" charset="utf-8"></script>
+    <script src="./js/babylon/babylon.js" charset="utf-8"></script>
+    <script src="./js/babylon/babylon.waterMaterial.js" charset="utf-8"></script>
 
-    <script src="./js/skybox.js" charset="utf-8"></script>
-    <script src="./js/ships.js" charset="utf-8"></script>
-    <script src="./js/water.js" charset="utf-8"></script>
-    <script src="./js/light.js" charset="utf-8"></script>
-    <script src="./js/emitter.js" charset="utf-8"></script>
-    <script src="./js/projectile.js" charset="utf-8"></script>
-    <script src="./js/opponent_board_class.js" charset="utf-8"></script>
-    <script src="./js/player_board_class.js" charset="utf-8"></script>
-    <script src="./js/turn.js" charset="utf-8"></script>
-    <script src="./js/ship.js" charset="utf-8"></script>
-    <script src="./js/game.js" charset="utf-8"></script>
-    <script src="./js/camera.js" charset="utf-8"></script>
-    <script src="./js/animations.js" charset="utf-8"></script>
-    <script src="./js/events.js" charset="utf-8"></script>
-    <script src="./js/scene_config.js" charset="utf-8"></script>
+    <script src="./js/scene/scene_config.js" charset="utf-8"></script>
+    <script src="./js/scene/camera.js" charset="utf-8"></script>
+    <script src="./js/scene/skybox.js" charset="utf-8"></script>
+    <script src="./js/scene/water.js" charset="utf-8"></script>
+    <script src="./js/scene/light.js" charset="utf-8"></script>
+    <script src="./js/scene/emitter.js" charset="utf-8"></script>
+
+    <script src="./js/actions/animations.js" charset="utf-8"></script>
+    <script src="./js/actions/events.js" charset="utf-8"></script>
+
+    <script src="./js/game/ship.js" charset="utf-8"></script>
+    <script src="./js/game/opponent.js" charset="utf-8"></script>
+    <script src="./js/game/player.js" charset="utf-8"></script>
+    <script src="./js/game/game.js" charset="utf-8"></script>
+    <script src="./js/game/board.js" charset="utf-8"></script>
+
     <script src="./js/battleship.js" charset="utf-8"></script>
   </body>
 </html>

@@ -13,11 +13,11 @@ const createCameraOutput = createCamera();
 const camera = createCameraOutput[0];
 const cameraTarget = createCameraOutput[1];
 const skybox = createSkybox();
-const playerBoard = new PlayerBoard();
-const opponentBoard = new OpponentBoard();
-createWater();
 createAnimations();
 createEventListeners();
+
+const game = new Game();
+const water = createWater();
 
 engine.runRenderLoop(() => {
     scene.render();

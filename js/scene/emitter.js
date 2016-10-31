@@ -5,7 +5,7 @@ const attatchEmitter = (mesh) => {
   particleSystem.renderingGroupId = 1;
 
   //Texture of each particle
-  particleSystem.particleTexture = new BABYLON.Texture("explosion.png", scene);
+  particleSystem.particleTexture = new BABYLON.Texture("textures/explosion.png", scene);
 
   // Where the particles come from
   particleSystem.emitter = mesh; // the starting object, the emitter
