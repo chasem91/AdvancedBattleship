@@ -212,7 +212,7 @@ Ship.createSegments = (name, boardName, length) => {
           box.position.z = (col + (idx * 20));
           break;
       }
-      // box.visibility = false;
+      box.visibility = false;
       box.isPickable = false;
     }
   });
