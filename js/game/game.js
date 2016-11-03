@@ -11,7 +11,7 @@ class Game {
   }
 
   won() {
-    return false;
+    return this.player.ships.every( ship => ship.isDestroyed ) || this.opponent.ships.every( ship => ship.isDestroyed )
   }
 
   currentPlayer() {

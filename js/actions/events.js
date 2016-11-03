@@ -108,8 +108,11 @@ const createEventListeners = () => {
       }
     } else if (e.key === "Enter") {
       if (preGame) {
-        lockPlayerBoard();
-        game.play();
+        // there shouldn't need to be 34 spaces
+        if (game.player.boardObject.grid.filter( space => space.materialIndex === 2).length === 34) {
+          lockPlayerBoard();
+          game.play();
+        }
       }
     }
   }

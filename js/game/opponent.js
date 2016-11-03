@@ -9,29 +9,46 @@ class Opponent {
   }
 
   playTurn() {
-    this.fire();
-    // setTimeout(() => {
-    // }, 1000);
+    setTimeout(() => {
+      this.fire();
+    }, 1000);
   }
 
   fire() {
+    let row;
+    let col;
+    let beenHit = true;
+    let pointXY;
     const projectile = new BABYLON.Mesh.CreateSphere("projectile", 16, 4, scene);
-    // if (opponentTurn) { playerTurn = false; }
-    let signed;
-    if (Math.random() < .5) { signed = -1; } else { signed = 1; }
-    let row = ((Math.floor(Math.random() * 6) * signed) * 20) + 10;
-    if (row === 110) {
-      row -= 20;
+    while (beenHit) {
+      const nextSpace = this._nextFirePos();
+
+      if (nextSpace) {
+        row = nextSpace.x;
+        col = nextSpace.z;
+      } else {
+        let signed;
+        if (Math.random() < .5) { signed = -1; } else { signed = 1; }
+        row = ((Math.floor(Math.random() * 6) * signed) * 20) + 10;
+        if (row === 110) {
+          row -= 20;
+        }
+
+        if (Math.random() < .5) { signed = -1; } else { signed = 1; }
+        col = ((Math.floor(Math.random() * 7) * signed) * 20) + 10;
+      }
+
+      projectile.position = new BABYLON.Vector3(
+        (Math.round(row / 20) * 20) - 490,
+        projectile.position.y,
+        (Math.round((col + 10) / 20) * 20) - 10
+      );
+
+      pointXY = { x: projectile.position.x - 480, z: projectile.position.z };
+      beenHit = game.player.boardObject.hasBeenHit(pointXY);
     }
+    // game.player.boardObject.hitSpaces.push(pointXY);
 
-    if (Math.random() < .5) { signed = -1; } else { signed = 1; }
-    let col = ((Math.floor(Math.random() * 7) * signed) * 20) + 10;
-
-    projectile.position = new BABYLON.Vector3(
-      (Math.round(row / 20) * 20) - 490,
-      projectile.position.y,
-      (Math.round((col + 10) / 20) * 20) - 10
-    );
     const vertAnim1 = () => {
       const animationProjectile = new BABYLON.Animation(
         "myAnimation1",
@@ -130,13 +147,20 @@ class Opponent {
             fireLight.dispose();
             game.player.shipSegments.forEach( shipSegment => {
               if (shipSegment.position.x === projectile.position.x && shipSegment.position.z === projectile.position.z) {
-                shipSegment.visibility = 1;
+                shipSegment.visibility = true;
                 shipSegment.material.subMaterials.shift();
-                new BABYLON.Sound("Music", "sounds/missile_impact.wav", scene, null, { loop: false, autoplay: true });
                 hit = true;
+                game.player.boardObject.shipHitSpaces.push({x: projectile.position.x, z: projectile.position.z});
+                game.player.checkShips();
               }
             });
-            if (!hit) {particleSystem.emitRate = 0;}
+            game.player.boardObject.hitSpaces.push({x: projectile.position.x, z: projectile.position.z});
+            if (hit) {
+              new BABYLON.Sound("Music", "sounds/missile_impact.wav", scene, null, { loop: false, autoplay: true });
+            } else {
+              particleSystem.emitRate = 0;
+              new BABYLON.Sound("Music", "sounds/splash.mp3", scene, null, { loop: false, autoplay: true });
+            }
             game.play();
           }
         )
@@ -153,6 +177,25 @@ class Opponent {
         return true;
       }
     });
+  }
+
+  _nextFirePos() {
+    let validSurrounding = [];
+    let inValid = true;
+    while (validSurrounding.length === 0) {
+      const hitSpaces = game.player.boardObject.shipHitSpaces;
+      if (hitSpaces.length === 0) { return null; }
+      const randomIndex = Math.floor(hitSpaces.length * Math.random());
+      const randomSpace = hitSpaces[randomIndex];
+      const surrounding = [
+        {x: randomSpace.x, z: randomSpace.z + 20},
+        {x: randomSpace.x, z: randomSpace.z - 20},
+        {x: randomSpace.x + 20, z: randomSpace.z},
+        {x: randomSpace.x - 20, z: randomSpace.z}
+      ];
+      validSurrounding = surrounding.filter( space => !game.player.boardObject.hasBeenHit(space) );
+    }
+    return validSurrounding[Math.floor(Math.random() * validSurrounding.length)];
   }
 }
 

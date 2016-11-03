@@ -2,6 +2,15 @@ class Board {
   constructor(player) {
     this.boardMesh = Board.createGrid(player);
     this.grid = this.boardMesh.subMeshes;
+    this.hitSpaces = [];
+    this.shipHitSpaces = [];
+    this.sunkSpaces = [];
+  }
+
+  hasBeenHit(pos) {
+    return this.hitSpaces.some( space => {
+      return space.x === pos.x && space.z === pos.z;
+    });
   }
 }
 
@@ -24,12 +33,15 @@ Board.createGrid = (player) => {
   if (player) {
     const lightGreenMaterial = new BABYLON.StandardMaterial("LightGreen", scene);
     lightGreenMaterial.diffuseColor = new BABYLON.Color3(.41, .61, .45);
+    lightGreenMaterial.alpha = .6;
 
     const darkGreenMaterial = new BABYLON.StandardMaterial("DarkGreen", scene);
     darkGreenMaterial.diffuseColor = new BABYLON.Color3(.79, 1.00, .80);
+    darkGreenMaterial.alpha = .6;
 
     const redMaterial = new BABYLON.StandardMaterial("Red", scene);
     redMaterial.diffuseColor = new BABYLON.Color3(1, 0, 0);
+    redMaterial.alpha = .6;
     redMaterial.emissiveColor = new BABYLON.Color3(1, 0, 0);
 
     multimat.subMaterials.push(lightGreenMaterial);
@@ -38,20 +50,20 @@ Board.createGrid = (player) => {
   } else {
     const lightRedMaterial = new BABYLON.StandardMaterial("LightRed", scene);
     lightRedMaterial.diffuseColor = new BABYLON.Color3(.95, 0, 0);
-    // lightRedMaterial.alpha = .2;
+    lightRedMaterial.alpha = .6;
 
     const darkRedMaterial = new BABYLON.StandardMaterial("DarkRed", scene);
     darkRedMaterial.diffuseColor = new BABYLON.Color3(.25, 0, 0);
-    // darkRedMaterial.alpha = .2;
+    darkRedMaterial.alpha = .6;
 
     const yellowMaterial = new BABYLON.StandardMaterial("Yellow", scene);
     yellowMaterial.diffuseColor = new BABYLON.Color3(1, 1, 0);
     yellowMaterial.emissiveColor = new BABYLON.Color3(1, 1, 0);
-    // yellowMaterial.alpha = .2;
+    yellowMaterial.alpha = .6;
 
     const orangeMaterial = new BABYLON.StandardMaterial("Orange", scene);
     orangeMaterial.diffuseColor = new BABYLON.Color3(1, .8, 0);
-    // orangeMaterial.alpha = .2;
+    orangeMaterial.alpha = .6;
 
     multimat.subMaterials.push(lightRedMaterial);
     multimat.subMaterials.push(darkRedMaterial);

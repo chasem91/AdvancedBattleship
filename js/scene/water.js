@@ -4,7 +4,7 @@ const createWater = () => {
   waterMesh.isPickable = false;
   waterMesh.position.y = 0;
   const waterMaterial = new BABYLON.WaterMaterial("water", scene, new BABYLON.Vector2(1024, 1024));
-  // waterMaterial.alpha = .8;
+  waterMaterial.alpha = .8;
   var probe = new BABYLON.ReflectionProbe("main", 512, scene);
   probe.renderList.push(game.opponent.board);
   probe.renderList.push(game.player.board);
@@ -18,20 +18,20 @@ const createWater = () => {
   waterMaterial.addToRenderList(game.player.board);
   waterMaterial.addToRenderList(game.opponent.board);
   waterMaterial.addToRenderList(skybox);
-  game.player.ships.forEach( ship => {
-    ship.segments.forEach( segment => waterMaterial.addToRenderList(segment) );
-  });
-  game.opponent.ships.forEach( ship => {
-    ship.segments.forEach( segment => waterMaterial.addToRenderList(segment) );
-  });
-  waterMaterial.windForce = 5;
-  waterMaterial.waveHeight = .3;
-  waterMaterial.bumpHeight = 0.05;
+  // game.player.ships.forEach( ship => {
+  //   ship.segments.forEach( segment => waterMaterial.addToRenderList(segment) );
+  // });
+  // game.opponent.ships.forEach( ship => {
+  //   ship.segments.forEach( segment => waterMaterial.addToRenderList(segment) );
+  // });
+  waterMaterial.windForce = 8;
+  waterMaterial.waveHeight = .7;
+  waterMaterial.bumpHeight = 0.25;
   waterMaterial.windDirection = new BABYLON.Vector2(1.0, 1.0);
-  waterMaterial.waterColor = new BABYLON.Color3(0.6, 0.6, 0.8);
+  // waterMaterial.waterColor = new BABYLON.Color3(0.6, 0.6, 0.8);
   // waterMaterial.colorBlendFactor = .1;
   waterMaterial.waveLength = .13;
-  waterMaterial.backFaceCulling = false;
+  waterMaterial.backFaceCulling = true;
 
   waterMesh.material = waterMaterial;
 

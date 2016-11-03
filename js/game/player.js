@@ -21,6 +21,14 @@ class Player {
       projectile.position.y,
       (Math.round((point.z + 10) / 20) * 20) - 10
     );
+
+    const pointXY = { x: projectile.position.x - 480, z: projectile.position.z };
+    if (game.opponent.boardObject.hasBeenHit(pointXY)) {
+      return;
+    } else {
+      game.opponent.boardObject.hitSpaces.push(pointXY);
+    }
+
     const vertAnim1 = () => {
       const animationProjectile = new BABYLON.Animation(
         "myAnimation1",
@@ -122,18 +130,39 @@ class Player {
               if (shipSegment.position.x === projectile.position.x && shipSegment.position.z === projectile.position.z) {
                 shipSegment.visibility = true;
                 shipSegment.material.subMaterials.shift();
-                new BABYLON.Sound("Music", "sounds/missile_impact.wav", scene, null, { loop: false, autoplay: true });
                 hit = true;
+                game.opponent.boardObject.shipHitSpaces.push({x: projectile.position.x, z: projectile.position.z});
                 game.opponent.checkShips();
               }
             });
-            if (!hit) {particleSystem.emitRate = 0;}
+            if (hit) {
+              new BABYLON.Sound("Music", "sounds/missile_impact.wav", scene, null, { loop: false, autoplay: true });
+            } else {
+              particleSystem.emitRate = 0;
+              new BABYLON.Sound("Music", "sounds/splash.mp3", scene, null, { loop: false, autoplay: true });
+            }
             game.play();
           }
         )
       }
     );
     canvas.removeEventListener("mouseup", this.fireEventHandler);
+  }
+
+  checkShips() {
+    this.ships = this.ships.filter( ship => {
+      if (ship.isDestroyed()) {
+        ship.segments.forEach( segment => {
+          this.boardObject.shipHitSpaces = this.boardObject.shipHitSpaces.filter( space => {
+            return !(space.x === segment.position.x && space.z === segment.position.z);
+          });
+        });
+        ship.sink();
+        return false;
+      } else {
+        return true;
+      }
+    });
   }
 }
 

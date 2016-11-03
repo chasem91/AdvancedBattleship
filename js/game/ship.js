@@ -41,7 +41,8 @@ class Ship {
     const parent = new BABYLON.Mesh.CreateBox("parent", 10, scene);
     parent.position = center;
     this.segments.forEach( segment => {
-      segment.animations = [];
+      scene.stopAnimation(segment);
+      // segment.animations = [];
       segment.position = segment.position.subtract(parent.position);
       segment.parent = parent;
     });
@@ -96,6 +97,17 @@ class Ship {
     parent.animations.push(animationSinkRotationY);
     parent.animations.push(animationSinkRotationZ);
 
+    const missile_impact = new BABYLON.Sound( "Music", "sounds/missile_impact.wav",
+      scene, null, { loop: false, autoplay: true }
+    );
+    for (var i = 0; i < 5; i++) {
+      setTimeout(
+        () => {
+          missile_impact.play();
+        },
+        i * 300
+      );
+    }
     scene.beginAnimation(parent, 0, 3000, false);
   }
 }
@@ -119,7 +131,6 @@ Ship.createSegments = (name, boardName, length) => {
     } else {
       dir = "RIGHT";
     }
-    dir = "LEFT";
 
     const coords = Ship.getRandomCoords();
     row = coords[0];
@@ -149,12 +160,11 @@ Ship.createSegments = (name, boardName, length) => {
         }
       });
       if (
-        (testPos.x > -140 || testPos.x < -340) ||
+        (testPos.x > -160 || testPos.x < -340) ||
         (testPos.z > 130 || testPos.z < -130)
       ) {
         invalidPostion = true;
       }
-
       i++;
     }
   }
@@ -202,7 +212,7 @@ Ship.createSegments = (name, boardName, length) => {
           box.position.z = (col + (idx * 20));
           break;
       }
-      box.visibility = false;
+      // box.visibility = false;
       box.isPickable = false;
     }
   });
