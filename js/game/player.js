@@ -174,6 +174,11 @@ Player.createShips = () => {
   ships.push(new Ship("destroyer1", "playerBoard", 3));
   ships.push(new Ship("submarine1", "playerBoard", 3));
   ships.push(new Ship("patrolBoat1", "playerBoard", 2));
+  // ships.push(new Ship("aircraftCarrier3", "playerBoard", 5));
+  // ships.push(new Ship("battleship3", "playerBoard", 4));
+  // ships.push(new Ship("destroyer3", "playerBoard", 3));
+  // ships.push(new Ship("submarine3", "playerBoard", 3));
+  // ships.push(new Ship("patrolBoat3", "playerBoard", 2));
 
   const shipAnimation = () => {
     const animationSegment = new BABYLON.Animation(

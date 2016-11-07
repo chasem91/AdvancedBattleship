@@ -8,9 +8,11 @@ class Board {
   }
 
   hasBeenHit(pos) {
-    return this.hitSpaces.some( space => {
-      return space.x === pos.x && space.z === pos.z;
-    });
+    return this.hitSpaces.some( space => space.x === pos.x && space.z === pos.z );
+  }
+
+  inBounds(pos) {
+    return pos.x <= 90 && pos.x >= -90 && pos.z <= 130 && pos.z >= -130;
   }
 }
 

@@ -19,8 +19,9 @@ class Opponent {
     let col;
     let beenHit = true;
     let pointXY;
+    let invalidPosition = true;
     const projectile = new BABYLON.Mesh.CreateSphere("projectile", 16, 4, scene);
-    while (beenHit) {
+    while (beenHit && invalidPosition) {
       const nextSpace = this._nextFirePos();
 
       if (nextSpace) {
@@ -46,6 +47,7 @@ class Opponent {
 
       pointXY = { x: projectile.position.x - 480, z: projectile.position.z };
       beenHit = game.player.boardObject.hasBeenHit(pointXY);
+      if (game.player.boardObject.inBounds([row, col])) { invalidPosition = false; }
     }
     // game.player.boardObject.hitSpaces.push(pointXY);
 
@@ -181,21 +183,90 @@ class Opponent {
 
   _nextFirePos() {
     let validSurrounding = [];
-    let inValid = true;
-    while (validSurrounding.length === 0) {
-      const hitSpaces = game.player.boardObject.shipHitSpaces;
-      if (hitSpaces.length === 0) { return null; }
-      const randomIndex = Math.floor(hitSpaces.length * Math.random());
-      const randomSpace = hitSpaces[randomIndex];
-      const surrounding = [
-        {x: randomSpace.x, z: randomSpace.z + 20},
-        {x: randomSpace.x, z: randomSpace.z - 20},
-        {x: randomSpace.x + 20, z: randomSpace.z},
-        {x: randomSpace.x - 20, z: randomSpace.z}
-      ];
-      validSurrounding = surrounding.filter( space => !game.player.boardObject.hasBeenHit(space) );
+    const hitSpaces = game.player.boardObject.shipHitSpaces;
+    let nextPos;
+    let invalidPosition = true;
+    while (validSurrounding.length === 0 || invalidPosition) {
+
+      if (hitSpaces.length === 0) {
+
+        return null;
+
+      } else if (hitSpaces.length === 1) {
+
+        const surrounding = [
+          {x: hitSpaces[0].x, z: hitSpaces[0].z + 20},
+          {x: hitSpaces[0].x, z: hitSpaces[0].z - 20},
+          {x: hitSpaces[0].x + 20, z: hitSpaces[0].z},
+          {x: hitSpaces[0].x - 20, z: hitSpaces[0].z}
+        ];
+        validSurrounding = surrounding.filter( space => !game.player.boardObject.hasBeenHit(space) );
+        nextPos = validSurrounding[Math.floor(Math.random() * validSurrounding.length)];
+        if (!game.player.boardObject.hasBeenHit(nextPos)) { invalidPosition = false; }
+
+      } else {
+
+        const randomIndex = Math.floor(Math.random() * hitSpaces.length);
+        const space = hitSpaces[randomIndex];
+        const surrounding = [
+          {x: space.x, z: space.z + 20},
+          {x: space.x, z: space.z - 20},
+          {x: space.x + 20, z: space.z},
+          {x: space.x - 20, z: space.z}
+        ];
+        const surroundingHits = [];
+        surrounding.forEach( surroundingSpace => {
+          if (hitSpaces.some( s => s.x === surroundingSpace.x && s.z === surroundingSpace.z )) {
+            surroundingHits.push(surroundingSpace);
+          }
+        });
+        const adjacentSpace = surroundingHits[Math.floor(Math.random() * surroundingHits.length)];
+        let dir;
+        if ((adjacentSpace.x - space.x) !== 0) { dir = "VERTICAL"; }
+        else if ((adjacentSpace.z - space.z) !== 0) { dir = "HORIZONTAL"; }
+
+        let i = 20;
+        let notFound1 = true;
+        let notFound2 = true;
+        let space1;
+        let space2;
+
+        while (notFound1 || notFound2) {
+          console.log("a");
+          switch (dir) {
+            case "VERTICAL":
+              if (notFound1) { space1 = {x: space.x + i, z: space.z}; }
+              if (notFound2) { space2 = {x: space.x - i, z: space.z}; }
+              break;
+            case "HORIZONTAL":
+              if (notFound1) { space1 = {x: space.x, z: space.z + i}; }
+              if (notFound2) { space2 = {x: space.x, z: space.z - i}; }
+              break;
+          }
+
+          if (notFound1 && hitSpaces.every( s => s.x !== space1.x || s.z !== space1.z )) { notFound1 = false; }
+          if (notFound2 && hitSpaces.every( s => s.x !== space2.x || s.z !== space2.z )) { notFound2 = false; }
+
+          i += 20;
+        }
+
+        if (!game.player.boardObject.inBounds(space1)) {
+          if (game.player.boardObject.inBounds(space2)) {
+            nextPos = space2;
+            if (!game.player.boardObject.hasBeenHit(nextPos)) { invalidPosition = false; }
+          } else {
+            console.log("error1");
+          }
+        } else if (game.player.boardObject.inBounds(space2)){
+          nextPos = (Math.floor(Math.random() * 2)) ? space1 : space2;
+          if (!game.player.boardObject.hasBeenHit(nextPos)) { invalidPosition = false; }
+        } else {
+          console.log("error2");
+        }
+        validSurrounding = [nextPos];
+      }
     }
-    return validSurrounding[Math.floor(Math.random() * validSurrounding.length)];
+    return nextPos;
   }
 }
 
