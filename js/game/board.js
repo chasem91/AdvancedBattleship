@@ -7,12 +7,23 @@ class Board {
     this.sunkSpaces = [];
   }
 
+  markSpace(pos) {
+    const row = pos[0];
+    const col = pos[1];
+    const index = (((((row + 110) / 20) - 1)) + ((((col + 150) / 20) - 1)  * 10)) * 2;
+    this.grid[index].materialIndex = 3;
+  }
+
   hasBeenHit(pos) {
     return this.hitSpaces.some( space => space.x === pos.x && space.z === pos.z );
   }
 
   inBounds(pos) {
     return pos.x <= 90 && pos.x >= -90 && pos.z <= 130 && pos.z >= -130;
+  }
+
+  validPos(pos) {
+    return ((!this.hasBeenHit(pos)) && this.inBounds(pos));
   }
 }
 
@@ -46,9 +57,15 @@ Board.createGrid = (player) => {
     redMaterial.alpha = .6;
     redMaterial.emissiveColor = new BABYLON.Color3(1, 0, 0);
 
+    const alphaMaterial = new BABYLON.StandardMaterial("Alpha", scene);
+    alphaMaterial.diffuseColor = new BABYLON.Color3(1, 0, 0);
+    alphaMaterial.alpha = 0;
+    alphaMaterial.emissiveColor = new BABYLON.Color3(1, 0, 0);
+
     multimat.subMaterials.push(lightGreenMaterial);
     multimat.subMaterials.push(darkGreenMaterial);
     multimat.subMaterials.push(redMaterial);
+    multimat.subMaterials.push(alphaMaterial);
   } else {
     const lightRedMaterial = new BABYLON.StandardMaterial("LightRed", scene);
     lightRedMaterial.diffuseColor = new BABYLON.Color3(.95, 0, 0);
@@ -65,7 +82,7 @@ Board.createGrid = (player) => {
 
     const orangeMaterial = new BABYLON.StandardMaterial("Orange", scene);
     orangeMaterial.diffuseColor = new BABYLON.Color3(1, .8, 0);
-    orangeMaterial.alpha = .6;
+    orangeMaterial.alpha = 0;
 
     multimat.subMaterials.push(lightRedMaterial);
     multimat.subMaterials.push(darkRedMaterial);

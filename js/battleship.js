@@ -2,7 +2,7 @@ const canvas = document.getElementById("render-canvas");
 const engine = new BABYLON.Engine(canvas, true);
 const scene = new BABYLON.Scene(engine);
 
-let preGame =  true;
+let preGame = true;
 let playingGame = false;
 let playerTurn = false;
 let opponentTurn = false;

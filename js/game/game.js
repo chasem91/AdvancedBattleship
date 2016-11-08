@@ -3,6 +3,7 @@ class Game {
     this.player = new Player();
     this.opponent = new Opponent();
     this.players = [this.opponent, this.player];
+    // this.players = [this.player, this.opponent];
   }
 
   play() {

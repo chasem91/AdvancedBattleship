@@ -117,6 +117,7 @@ Ship.createSegments = (name, boardName, length) => {
   let dir = "";
   let row;
   let col;
+  const tagName = boardName === "playerBoard" ? "playerShip" : "playerShip";
 
   while (invalidPostion) {
     invalidPostion = false;
@@ -154,11 +155,13 @@ Ship.createSegments = (name, boardName, length) => {
         testPos = new BABYLON.Vector3(row, 0, col + (i * 20));
         break;
       }
-      scene.getMeshesByTags("opponentShip").forEach(ship => {
+      if (boardName === "playerBoard") { testPos.x += 250; }
+      scene.getMeshesByTags(tagName).forEach(ship => {
         if (((ship.position.x === testPos.x) && (ship.position.z === testPos.z))) {
           invalidPostion = true;
         }
       });
+      if (boardName === "playerBoard") { testPos.x -= 250;}
       if (
         (testPos.x > -160 || testPos.x < -340) ||
         (testPos.z > 130 || testPos.z < -130)
@@ -190,28 +193,28 @@ Ship.createSegments = (name, boardName, length) => {
   boxes.forEach( (box, idx) => {
     BABYLON.Tags.EnableFor(box);
     BABYLON.Tags.AddTagsTo(box, name);
+    BABYLON.Tags.AddTagsTo(box, tagName);
+    switch(dir) {
+      case "UP":
+        box.position.x = (row - (idx * 20));
+        box.position.z = col;
+        break;
+      case "DOWN":
+        box.position.x = (row + (idx * 20));
+        box.position.z = col;
+        break;
+      case "LEFT":
+        box.position.x = row
+        box.position.z = (col - (idx * 20));
+        break;
+      case "RIGHT":
+        box.position.x = row
+        box.position.z = (col + (idx * 20));
+        break;
+    }
     if (boardName === "playerBoard") {
-      box.position.x = 20 * idx;
+      box.position.x += 250;
     } else {
-      BABYLON.Tags.AddTagsTo(box, "opponentShip");
-      switch(dir) {
-        case "UP":
-          box.position.x = (row - (idx * 20));
-          box.position.z = col
-          break;
-        case "DOWN":
-          box.position.x = (row + (idx * 20));
-          box.position.z = col
-          break;
-        case "LEFT":
-          box.position.x = row
-          box.position.z = (col - (idx * 20));
-          break;
-        case "RIGHT":
-          box.position.x = row
-          box.position.z = (col + (idx * 20));
-          break;
-      }
       box.visibility = false;
       box.isPickable = false;
     }

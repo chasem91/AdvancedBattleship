@@ -4,6 +4,9 @@ const createEventListeners = () => {
   const lockPlayerBoard = () => {
     preGame = false;
     playingGame = true;
+    game.player.grid.forEach( subMesh => {
+      subMesh.materialIndex = subMesh.originalMaterialIndex
+    });
   }
   const snapToGrid = () => {
     const shipSegments = scene.getMeshesByTags(currentMesh.id);
@@ -78,7 +81,7 @@ const createEventListeners = () => {
   }
   const onKeyPress = (e) => {
     if (e.key === " ") {
-      if (currentMesh) {
+      if (currentMesh && preGame) {
         const currentMeshes = scene.getMeshesByTags(currentMesh.id);
         const oldPosition = currentMesh.position;
         currentMeshes.forEach( mesh => {

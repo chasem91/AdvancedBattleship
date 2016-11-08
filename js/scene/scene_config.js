@@ -14,9 +14,6 @@ const configureScene = () => {
   // }
 
   scene.registerBeforeRender(() => {
-    game.player.grid.forEach( subMesh => {
-      subMesh.materialIndex = subMesh.originalMaterialIndex
-    });
     game.opponent.grid.forEach( subMesh => {
       subMesh.materialIndex = subMesh.hit ? 3 : subMesh.originalMaterialIndex
     });
@@ -30,6 +27,9 @@ const configureScene = () => {
       }
     }
     if (preGame) {
+      game.player.grid.forEach( subMesh => {
+        subMesh.materialIndex = subMesh.originalMaterialIndex
+      });
       game.player.shipSegments.forEach(segment => {
         // y param might need to be 1
         let ray = new BABYLON.Ray(
