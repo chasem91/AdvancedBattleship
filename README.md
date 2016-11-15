@@ -2,7 +2,7 @@
 
 ### Background
 
-Advanced Battleship is based on the original Battleship and its variation **Battleship: Advanced Mission**.
+[Advanced Battleship](http://advancedbattleship.com) is based on the original Battleship and its variation **Battleship: Advanced Mission**.
 
 1) This game will be played just like the original Battleship, but each ship has its own distinct weapon it can use.
 2) Each ship has a finite number of times its weapon can be deployed, but the player may always choose to launch a single space attack, even after all ships have used up their weapons.
@@ -28,7 +28,7 @@ In addition, this project will include:
 
 This app will consist of a single screen with game board, game controls, and the Pause/About modal.  Game controls will include Weapon Options, Fire, Begin, Forfeit, and Reset buttons as well as a difficulty option in the Pause/About modal.
 
-![wireframes](https://github.com/chasem91/AdvancedBattleship/blob/master/advanced_battleship.jpg)
+![wireframes](https://github.com/chasem91/AdvancedBattleship/blob/master/docs/advanced_battleship.jpg)
 
 ### Architecture and Technologies
 
