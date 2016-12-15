@@ -17,7 +17,7 @@ createAnimations();
 createEventListeners();
 
 const game = new Game();
-// const water = createWater();
+const water = createWater();
 
 engine.runRenderLoop(() => {
     scene.render();
