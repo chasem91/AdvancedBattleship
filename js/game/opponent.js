@@ -17,7 +17,6 @@ class Opponent {
   fire() {
     let row;
     let col;
-    // let beenHit = true;
     let pointXY;
     let invalidPosition = true;
     const projectile = new BABYLON.Mesh.CreateSphere("projectile", 16, 4, scene);
@@ -49,8 +48,6 @@ class Opponent {
       );
 
       pointXY = { x: projectile.position.x - 480, z: projectile.position.z };
-      // debugger
-      // beenHit = game.player.boardObject.hasBeenHit(pointXY);
       invalidPosition = !game.player.boardObject.validPos({x: row, z: col});
     }
 
@@ -187,7 +184,8 @@ class Opponent {
 
   _nextFirePos() {
     let validSurrounding = [];
-    let hitSpaces = game.player.boardObject.shipHitSpaces;
+    const board = game.player.boardObject;
+    let hitSpaces = board.shipHitSpaces;
     let nextPos;
     let invalidPosition = true;
     while (validSurrounding.length === 0 || invalidPosition) {
@@ -204,15 +202,13 @@ class Opponent {
           {x: hitSpaces[0].x + 20, z: hitSpaces[0].z},
           {x: hitSpaces[0].x - 20, z: hitSpaces[0].z}
         ];
-        // debugger
-        validSurrounding = surrounding.filter( space => game.player.boardObject.validPos(space) );
-        // invalidPosition = validSurrounding.length > 0 ? false : true;
+        validSurrounding = surrounding.filter( space => board.validPos(space) );
         if (validSurrounding.length > 0) {
           invalidPosition = false;
           nextPos = validSurrounding[Math.floor(Math.random() * validSurrounding.length)];
         } else {
           invalidPosition = true;
-          hitSpaces = game.player.boardObject.shipHitSpaces;
+          hitSpaces = board.shipHitSpaces;
           hitSpaces = [hitSpaces[Math.floor(Math.random() * hitSpaces.length)]];
         }
       } else {
@@ -227,7 +223,7 @@ class Opponent {
         ];
         const surroundingHits = [];
         surrounding.forEach( surroundingSpace => {
-          if (game.player.boardObject.hasBeenHit(surroundingSpace)) {
+          if (board.hasBeenHit(surroundingSpace)) {
             surroundingHits.push(surroundingSpace);
           }
         });
@@ -260,13 +256,13 @@ class Opponent {
           i += 20;
         }
 
-        if (game.player.boardObject.validPos(space1) && game.player.boardObject.validPos(space2)) {
+        if (board.validPos(space1) && board.validPos(space2)) {
           invalidPosition = false;
           nextPos = (Math.floor(Math.random() * 2)) ? space1 : space2;
-        } else if (game.player.boardObject.validPos(space1)) {
+        } else if (board.validPos(space1)) {
           invalidPosition = false;
           nextPos = space1;
-        } else if (game.player.boardObject.validPos(space2)) {
+        } else if (board.validPos(space2)) {
           invalidPosition = false;
           nextPos = space2;
         } else {
